@@ -28,7 +28,9 @@ set(DUCKDB_MODULE_BASE_DIR "${CMAKE_CURRENT_LIST_DIR}")
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-set(CMAKE_CXX_STANDARD "11" CACHE STRING "C++ standard to enforce")
+if (NOT AS_MYSQL_SUBPROJECT)
+  set(CMAKE_CXX_STANDARD "11" CACHE STRING "C++ standard to enforce")
+endif(NOT AS_MYSQL_SUBPROJECT)
 
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
@@ -51,6 +53,7 @@ endif()
 # default to gnu standard installation directories (lib, bin, include)
 # https://cmake.org/cmake/help/latest/module/GNUInstallDirs.html
 include(GNUInstallDirs)
+if (NOT AS_MYSQL_SUBPROJECT)
 set(INSTALL_LIB_DIR
     ${CMAKE_INSTALL_LIBDIR}
     CACHE PATH "Installation directory for libraries")
@@ -60,6 +63,18 @@ set(INSTALL_BIN_DIR
 set(INSTALL_INCLUDE_DIR
     ${CMAKE_INSTALL_INCLUDEDIR}
     CACHE PATH "Installation directory for header files")
+else (NOT AS_MYSQL_SUBPROJECT)
+set(INSTALL_LIB_DIR
+    ${CMAKE_BINARY_DIR}/${DUCKDB_BUNDLE_RELATIVE_PATH}/install/lib
+    CACHE PATH "Installation directory for libraries")
+set(INSTALL_BIN_DIR
+    ${CMAKE_BINARY_DIR}/${DUCKDB_BUNDLE_RELATIVE_PATH}/install/bin
+    CACHE PATH "Installation directory for executables")
+set(INSTALL_INCLUDE_DIR
+    ${CMAKE_BINARY_DIR}/${DUCKDB_BUNDLE_RELATIVE_PATH}/install/include
+    CACHE PATH "Installation directory for header files")
+endif (NOT AS_MYSQL_SUBPROJECT)
+    
 if(WIN32 AND NOT CYGWIN)
   set(DEF_INSTALL_CMAKE_DIR cmake)
 else()

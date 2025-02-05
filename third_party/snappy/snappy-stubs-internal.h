@@ -33,7 +33,9 @@
 
 // DuckDB - LNK: define here instead of in CMake
 #ifdef __GNUC__
-#define HAVE_BUILTIN_EXPECT 1
+#ifndef HAVE_BUILTIN_EXPECT
+  #define HAVE_BUILTIN_EXPECT 1
+#endif
 #define HAVE_BUILTIN_CTZ 1
 #define HAVE_BUILTIN_PREFETCH 1
 #endif
