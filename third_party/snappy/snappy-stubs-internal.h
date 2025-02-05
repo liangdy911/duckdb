@@ -554,7 +554,9 @@ inline char* string_as_array(std::string* str) {
 
 // DuckDB - LNK: define here instead of in CMake
 #ifdef __GNUC__
-#define HAVE_BUILTIN_EXPECT
+#ifndef HAVE_BUILTIN_EXPECT
+  #define HAVE_BUILTIN_EXPECT
+#endif
 #define HAVE_BUILTIN_CTZ
 #define HAVE_BUILTIN_PREFETCH
 #endif

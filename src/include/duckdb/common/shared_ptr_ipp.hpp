@@ -59,7 +59,7 @@ public:
 	template <class U>
 	shared_ptr(const shared_ptr<U> &ref, T *ptr) noexcept : internal(ref.internal, ptr) {
 	}
-#if _LIBCPP_STD_VER >= 20
+#if defined(_LIBCPP_STD_VER) && _LIBCPP_STD_VER >= 20
 	template <class U>
 	shared_ptr(shared_ptr<U> &&ref, T *ptr) noexcept : internal(std::move(ref.internal), ptr) {
 	}

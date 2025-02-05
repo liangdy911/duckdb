@@ -21,7 +21,7 @@ namespace duckdb {
 // https://github.com/llvm/llvm-project/blob/08bb121835be432ac52372f92845950628ce9a4a/libcxx/include/__memory/shared_ptr.h#353
 // originally named '__compatible_with'
 
-#if _LIBCPP_STD_VER >= 17
+#if defined(_LIBCPP_STD_VER) && _LIBCPP_STD_VER >= 17
 template <class U, class T>
 struct __bounded_convertible_to_unbounded : std::false_type {};
 
@@ -33,7 +33,7 @@ struct compatible_with_t : std::_Or<std::is_convertible<U *, T *>, __bounded_con
 #else
 template <class U, class T>
 struct compatible_with_t : std::is_convertible<U *, T *> {}; // NOLINT: invalid case style
-#endif // _LIBCPP_STD_VER >= 17
+#endif // defined(_LIBCPP_STD_VER) && _LIBCPP_STD_VER >= 17
 
 } // namespace duckdb
 
