@@ -1190,7 +1190,14 @@ endforeach()
 # Load extensions passed through cmake config var
 foreach(EXT IN LISTS BUILD_EXTENSIONS)
   if(NOT "${EXT}" STREQUAL "")
-    duckdb_extension_load(${EXT})
+    if("${EXT}" STREQUAL "csi")
+      duckdb_extension_load(csi
+      SOURCE_DIR "${DUCKDB_CSI_EXTENSION_PATH}"
+      (INCLUDE_DIR "${DUCKDB_CSI_EXTENSION_PATH}/include")
+      )
+    else()
+      duckdb_extension_load(${EXT})
+    endif()
   endif()
 endforeach()
 
