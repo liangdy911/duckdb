@@ -91,6 +91,14 @@ void StringStats::ResetMaxStringLength(BaseStatistics &stats) {
 	StringStats::GetDataUnsafe(stats).has_max_string_length = false;
 }
 
+void StringStats::SetMaxStringLength(BaseStatistics &stats, idx_t max_length) {
+	auto &string_data = StringStats::GetDataUnsafe(stats);
+	if (max_length > string_data.max_string_length) {
+		string_data.max_string_length = UnsafeNumericCast<uint32_t>(max_length);
+	}
+	string_data.has_max_string_length = true;
+}
+
 void StringStats::SetContainsUnicode(BaseStatistics &stats) {
 	StringStats::GetDataUnsafe(stats).has_unicode = true;
 }
