@@ -4224,7 +4224,7 @@ static const MetadataCommand metadata_commands[] = {
     {"utf8", 1, SetUTF8Mode, "", "Enable experimental UTF-8 console output mode", 0},
 #endif
 
-    {nullptr, 0, nullptr}};
+    {nullptr, 0, nullptr, "", "", 0}};
 
 /*
 ** If an input line begins with "." then invoke this routine to
