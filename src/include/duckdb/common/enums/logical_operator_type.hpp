@@ -107,6 +107,15 @@ enum class LogicalOperatorType : uint8_t {
 	// -----------------------------
 	LOGICAL_CREATE_SECRET = 190,
 
+	// -----------------------------
+	// Monitor_Dump
+	// -----------------------------
+	LOGICAL_MONITOR_DUMP = 252,
+	// -----------------------------
+	// TDStore_ExtensionOperator
+	// -----------------------------
+	LOGICAL_EXCHANGE_IN = 253, // data source operator
+	LOGICAL_EXCHANGE_OUT = 254,
 	LOGICAL_EXTENSION_OPERATOR = 255
 };
 

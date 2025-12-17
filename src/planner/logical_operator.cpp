@@ -16,6 +16,19 @@
 
 namespace duckdb {
 
+std::unordered_map<duckdb::LogicalOperatorType, uint32_t> physical_operator_expansion_limit
+({
+  {duckdb::LogicalOperatorType::LOGICAL_GET, 3},
+  {duckdb::LogicalOperatorType::LOGICAL_FILTER, 2},
+  {duckdb::LogicalOperatorType::LOGICAL_WINDOW, 2},
+  {duckdb::LogicalOperatorType::LOGICAL_UNION, 2},
+  {duckdb::LogicalOperatorType::LOGICAL_EXCEPT, 2},
+  {duckdb::LogicalOperatorType::LOGICAL_INTERSECT, 2},
+  {duckdb::LogicalOperatorType::LOGICAL_DISTINCT, 2},
+  {duckdb::LogicalOperatorType::LOGICAL_AGGREGATE_AND_GROUP_BY,2},
+  {duckdb::LogicalOperatorType::LOGICAL_DELIM_JOIN,4},
+});
+
 LogicalOperator::LogicalOperator(LogicalOperatorType type)
     : type(type), estimated_cardinality(0), has_estimated_cardinality(false) {
 }

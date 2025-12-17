@@ -781,4 +781,59 @@ unique_ptr<LogicalOperator> LogicalWindow::Deserialize(Deserializer &deserialize
 	return std::move(result);
 }
 
+void LogicalExchangeIn::Serialize(Serializer &serializer) const {
+	LogicalOperator::Serialize(serializer);
+	serializer.WriteProperty<ExchangeType>(200, "exchang_type", exchange_type);
+	serializer.WriteProperty<ulong>(201, "conn_id", conn_id);
+	serializer.WriteProperty<FragmentID>(202, "fragment_id", fragment_id);
+	serializer.WriteProperty<FragmentID>(203, "child_exch_out_fragment_id", child_exch_out_fragment_id);
+}
+
+unique_ptr<LogicalOperator> LogicalExchangeIn::Deserialize(Deserializer &deserializer) {
+	auto exchange_type = deserializer.ReadProperty<ExchangeType>(200, "exchang_type");
+	auto conn_id = deserializer.ReadProperty<ulong>(201, "conn_id");
+	auto fragment_id = deserializer.ReadProperty<FragmentID>(202, "fragment_id");
+	auto child_exch_out_fragment_id = deserializer.ReadProperty<FragmentID>(203, "child_exch_out_fragment_id");
+	auto result = duckdb::unique_ptr<LogicalExchangeIn>(new LogicalExchangeIn(exchange_type, conn_id));
+	result->fragment_id = fragment_id;
+	result->child_exch_out_fragment_id = child_exch_out_fragment_id;
+	return std::move(result);
+}
+
+void LogicalExchangeOut::Serialize(Serializer &serializer) const {
+	LogicalOperator::Serialize(serializer);
+	serializer.WriteProperty<ExchangeType>(200, "exchang_type", exchange_type);
+	serializer.WriteProperty<ulong>(201, "conn_id", conn_id);
+	serializer.WriteProperty<FragmentID>(202, "fragment_id", fragment_id);
+	serializer.WriteProperty<FragmentID>(203, "parent_exch_in_fragment_id", parent_exch_in_fragment_id);
+	serializer.WriteProperty<vector<unique_ptr<Expression>>>(204, "part_expressions", part_expressions);
+	serializer.WriteProperty<bool>(205, "print_chunk", print_chunk);
+}
+
+unique_ptr<LogicalOperator> LogicalExchangeOut::Deserialize(Deserializer &deserializer) {
+	auto exchange_type = deserializer.ReadProperty<ExchangeType>(200, "exchang_type");
+	auto conn_id = deserializer.ReadProperty<ulong>(201, "conn_id");
+	auto fragment_id = deserializer.ReadProperty<FragmentID>(202, "fragment_id");
+	auto parent_exch_in_fragment_id = deserializer.ReadProperty<FragmentID>(203, "parent_exch_in_fragment_id");
+	vector<unique_ptr<Expression>> hash_exprs;
+	auto part_expressions = deserializer.ReadProperty<vector<unique_ptr<Expression>>>(204, "part_expressions");
+	auto print_chunk = deserializer.ReadProperty<bool>(205, "print_chunk");
+	auto result = duckdb::unique_ptr<LogicalExchangeOut>(
+	    new LogicalExchangeOut(exchange_type, conn_id, std::move(part_expressions)));
+	result->fragment_id = fragment_id;
+	result->parent_exch_in_fragment_id = parent_exch_in_fragment_id;
+	result->print_chunk = print_chunk;
+	return std::move(result);
+}
+
+void LogicalMonitorDump::Serialize(Serializer &serializer) const {
+	LogicalOperator::Serialize(serializer);
+}
+
+unique_ptr<LogicalOperator> LogicalMonitorDump::Deserialize(Deserializer &deserializer) {
+	auto result = duckdb::unique_ptr<LogicalMonitorDump>(new LogicalMonitorDump());
+	return std::move(result);
+}
+
+
 } // namespace duckdb

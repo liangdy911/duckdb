@@ -173,6 +173,12 @@ PhysicalOperator &PhysicalPlanGenerator::CreatePlan(LogicalOperator &op) {
 		auto &extension_op = op.Cast<LogicalExtensionOperator>();
 		return extension_op.CreatePlan(context, *this);
 	}
+	case LogicalOperatorType::LOGICAL_EXCHANGE_OUT:
+		//return CreatePlan(op.Cast<LogicalExchangeOut>());
+	case LogicalOperatorType::LOGICAL_EXCHANGE_IN:
+		//return CreatePlan(op.Cast<LogicalExchangeIn>(), context);
+	case LogicalOperatorType::LOGICAL_MONITOR_DUMP:
+		//return CreatePlan(op.Cast<LogicalMonitorDump>());
 	case LogicalOperatorType::LOGICAL_JOIN:
 	case LogicalOperatorType::LOGICAL_DEPENDENT_JOIN:
 	case LogicalOperatorType::LOGICAL_INVALID: {

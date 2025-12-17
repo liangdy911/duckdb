@@ -43,6 +43,8 @@ public:
 	idx_t estimated_cardinality;
 	bool has_estimated_cardinality;
 
+	//! Unique identifier in the logical plan tree, set after generating distributed plans
+	uint32_t operator_id = 0;
 public:
 	virtual vector<ColumnBinding> GetColumnBindings();
 	static string ColumnBindingsToString(const vector<ColumnBinding> &bindings);
@@ -60,6 +62,9 @@ public:
 	DUCKDB_API void Print();
 	//! Debug method: verify that the integrity of expressions & child nodes are maintained
 	virtual void Verify(ClientContext &context);
+	void SetOperatorId(int id) {
+		operator_id = id;
+	}
 
 	void AddChild(unique_ptr<LogicalOperator> child);
 	virtual idx_t EstimateCardinality(ClientContext &context);
@@ -108,4 +113,9 @@ public:
 		return reinterpret_cast<const TARGET &>(*this);
 	}
 };
+
+// Maps logical operators to the maximum number of physical operators they may generate.
+// Some logical operators (e.g., LOGICAL_DELIM_JOIN) expand into multiple physical operators during plan generation.
+// This ensures we reserve sufficient operator_id slots for the entire physical operator subtree.
+extern std::unordered_map<duckdb::LogicalOperatorType, uint32_t> physical_operator_expansion_limit;
 } // namespace duckdb

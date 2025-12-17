@@ -130,6 +130,12 @@ string LogicalOperatorToString(LogicalOperatorType type) {
 		return "PIVOT";
 	case LogicalOperatorType::LOGICAL_UPDATE_EXTENSIONS:
 		return "UPDATE_EXTENSIONS";
+	case LogicalOperatorType::LOGICAL_EXCHANGE_IN:
+		return "EXCHANGE_IN";
+	case LogicalOperatorType::LOGICAL_EXCHANGE_OUT:
+		return "EXCHANGE_OUT";
+	case LogicalOperatorType::LOGICAL_MONITOR_DUMP:
+		return "MONITOR_DUMP";
 	}
 	return "INVALID";
 }

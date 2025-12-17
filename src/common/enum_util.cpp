@@ -24,6 +24,7 @@
 #include "duckdb/common/enums/debug_initialize.hpp"
 #include "duckdb/common/enums/debug_vector_verification.hpp"
 #include "duckdb/common/enums/destroy_buffer_upon.hpp"
+#include "duckdb/common/enums/exchange_type.hpp"
 #include "duckdb/common/enums/explain_format.hpp"
 #include "duckdb/common/enums/expression_type.hpp"
 #include "duckdb/common/enums/file_compression_type.hpp"
@@ -1363,6 +1364,26 @@ const char* EnumUtil::ToChars<ExceptionType>(ExceptionType value) {
 template<>
 ExceptionType EnumUtil::FromString<ExceptionType>(const char *value) {
 	return static_cast<ExceptionType>(StringUtil::StringToEnum(GetExceptionTypeValues(), 43, "ExceptionType", value));
+}
+
+const StringUtil::EnumStringLiteral *GetExchangeTypeValues() {
+	static constexpr StringUtil::EnumStringLiteral values[] {
+		{ static_cast<uint32_t>(ExchangeType::GATHER), "GATHER" },
+		{ static_cast<uint32_t>(ExchangeType::BROADCAST), "BROADCAST" },
+		{ static_cast<uint32_t>(ExchangeType::SHUFFLE), "SHUFFLE" },
+		{ static_cast<uint32_t>(ExchangeType::NONE), "NONE" }
+	};
+	return values;
+}
+
+template<>
+const char* EnumUtil::ToChars<ExchangeType>(ExchangeType value) {
+	return StringUtil::EnumToString(GetExchangeTypeValues(), 4, "ExchangeType", static_cast<uint32_t>(value));
+}
+
+template<>
+ExchangeType EnumUtil::FromString<ExchangeType>(const char *value) {
+	return static_cast<ExchangeType>(StringUtil::StringToEnum(GetExchangeTypeValues(), 4, "ExchangeType", value));
 }
 
 const StringUtil::EnumStringLiteral *GetExplainFormatValues() {
