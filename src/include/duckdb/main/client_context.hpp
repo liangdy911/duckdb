@@ -37,6 +37,7 @@ class CatalogSearchPath;
 class ColumnDataCollection;
 class DatabaseInstance;
 class FileOpener;
+class FragmentTree;
 class LogicalOperator;
 class PreparedStatementData;
 class Relation;
@@ -222,6 +223,12 @@ public:
 	//! Process an error for display to the user
 	DUCKDB_API void ProcessError(ErrorData &error, const string &query) const;
 
+	bool IsDistributeCoordinator();
+
+	unique_ptr<FragmentTree> &GetFragmentTree() {
+		return fragment_tree;
+	}
+
 private:
 	//! Parse statements and resolve pragmas from a query
 	bool ParseStatements(ClientContextLock &lock, const string &query, vector<unique_ptr<SQLStatement>> &result,
@@ -302,6 +309,9 @@ private:
 	CreatePreparedStatementInternal(ClientContextLock &lock, const string &query, unique_ptr<SQLStatement> statement,
 	                                optional_ptr<case_insensitive_map_t<BoundParameterData>> values);
 
+	void StartDistributeSchedulerIfNeeded();
+	void StopDistributeSchedulerIfNeeded();
+
 private:
 	//! Lock on using the ClientContext in parallel
 	mutex context_lock;
@@ -311,6 +321,8 @@ private:
 	QueryProgress query_progress;
 	//! The connection corresponding to this client context
 	connection_t connection_id;
+
+	unique_ptr<FragmentTree> fragment_tree;
 };
 
 class ClientContextLock {

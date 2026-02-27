@@ -165,6 +165,10 @@ string PhysicalOperatorToString(PhysicalOperatorType type) {
 		return "VERIFY_VECTOR";
 	case PhysicalOperatorType::UPDATE_EXTENSIONS:
 		return "UPDATE_EXTENSIONS";
+	case PhysicalOperatorType::EXCHANGE_IN:
+		return "EXCHANGE_IN";
+	case PhysicalOperatorType::EXCHANGE_OUT:
+		return "EXCHANGE_OUT";
 	case PhysicalOperatorType::INVALID:
 		break;
 	}

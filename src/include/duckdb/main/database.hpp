@@ -24,6 +24,7 @@ class Catalog;
 class TransactionManager;
 class ConnectionManager;
 class FileSystem;
+class FragmentScheduler;
 class TaskScheduler;
 class ObjectCache;
 struct AttachInfo;
@@ -57,6 +58,7 @@ public:
 	DUCKDB_API FileSystem &GetFileSystem();
 	DUCKDB_API ExternalFileCache &GetExternalFileCache();
 	DUCKDB_API TaskScheduler &GetScheduler();
+	DUCKDB_API FragmentScheduler &GetDistributeScheduler();
 	DUCKDB_API ObjectCache &GetObjectCache();
 	DUCKDB_API ConnectionManager &GetConnectionManager();
 	DUCKDB_API ValidChecker &GetValidChecker();
@@ -91,6 +93,7 @@ private:
 	shared_ptr<BufferManager> buffer_manager;
 	unique_ptr<DatabaseManager> db_manager;
 	unique_ptr<TaskScheduler> scheduler;
+	unique_ptr<FragmentScheduler> distribute_scheduler;
 	unique_ptr<ObjectCache> object_cache;
 	unique_ptr<ConnectionManager> connection_manager;
 	unordered_map<string, ExtensionInfo> loaded_extensions_info;

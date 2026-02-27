@@ -8,6 +8,8 @@
 #include "duckdb/common/progress_bar/progress_bar.hpp"
 #include "duckdb/common/serializer/buffered_file_writer.hpp"
 #include "duckdb/common/types/column/column_data_collection.hpp"
+#include "duckdb/distribute/fragment_scheduler.hpp"
+#include "duckdb/distribute/fragment_tree_generator.hpp"
 #include "duckdb/execution/column_binding_resolver.hpp"
 #include "duckdb/execution/operator/helper/physical_result_collector.hpp"
 #include "duckdb/execution/physical_plan_generator.hpp"
@@ -231,6 +233,7 @@ ErrorData ClientContext::EndQueryInternal(ClientContextLock &lock, bool success,
 	}
 	active_query->progress_bar.reset();
 	D_ASSERT(active_query.get());
+	StopDistributeSchedulerIfNeeded();
 	active_query.reset();
 	query_progress.Initialize();
 	ErrorData error;
@@ -359,6 +362,7 @@ ClientContext::CreatePreparedStatementInternal(ClientContextLock &lock, const st
 	auto result = make_shared_ptr<PreparedStatementData>(statement_type);
 
 	auto &profiler = QueryProfiler::Get(*this);
+	bool is_explain_analyze = IsExplainAnalyze(statement.get());
 	profiler.StartQuery(query, IsExplainAnalyze(statement.get()), true);
 	profiler.StartPhase(MetricsType::PLANNER);
 	Planner logical_planner(*this);
@@ -396,6 +400,12 @@ ClientContext::CreatePreparedStatementInternal(ClientContextLock &lock, const st
 		logical_plan->Verify(*this);
 #endif
 	}
+
+	// Create fragment tree
+	FragmentTreeGenerator frag_tree_gen(*this);
+	// create all the data channels and one manage channel.
+	auto frag_tree = frag_tree_gen.Create(logical_plan.get(), statement_type, is_explain_analyze);
+	fragment_tree = std::move(frag_tree);
 
 	// Convert the logical query plan into a physical query plan.
 	profiler.StartPhase(MetricsType::PHYSICAL_PLANNER);
@@ -508,6 +518,28 @@ void ClientContext::CheckIfPreparedStatementIsExecutable(PreparedStatementData &
 	}
 }
 
+void ClientContext::StartDistributeSchedulerIfNeeded() {
+	if (fragment_tree) {
+		// std::thread *distribute_scheduler = new std::thread(FregmentScheduler::DoScheduleInThread,
+		//    context->active_query->prepared->distribute_plan.get(), nullptr, context.get());
+		FragmentScheduler::GetScheduler(*this).ExecuteInThread(fragment_tree.get(), this);
+	}
+}
+
+void ClientContext::StopDistributeSchedulerIfNeeded() {
+	if (fragment_tree) {
+		FragmentScheduler::GetScheduler(*this).ExecuteFinalize(fragment_tree.get(), this);
+		fragment_tree.reset();
+	}
+}
+
+bool ClientContext::IsDistributeCoordinator() {
+	if (fragment_tree) {
+		return fragment_tree->role == DistributeRole::COORDINATOR;
+	}
+	return false;
+}
+
 unique_ptr<PendingQueryResult>
 ClientContext::PendingPreparedStatementInternal(ClientContextLock &lock, shared_ptr<PreparedStatementData> statement_p,
                                                 const PendingQueryParameters &parameters) {
@@ -540,6 +572,8 @@ ClientContext::PendingPreparedStatementInternal(ClientContextLock &lock, shared_
 	statement.is_streaming = stream_result;
 	auto collector = get_method(*this, statement);
 	D_ASSERT(collector->type == PhysicalOperatorType::RESULT_COLLECTOR);
+	// Start distribute scheduler if it's a distribute plan.
+	StartDistributeSchedulerIfNeeded();
 	executor.Initialize(std::move(collector));
 
 	auto types = executor.GetTypes();

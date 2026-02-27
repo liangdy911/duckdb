@@ -8,6 +8,7 @@ add_subdirectory(persistent)
 add_subdirectory(projection)
 add_subdirectory(scan)
 add_subdirectory(schema)
+add_subdirectory(shuffle)
 add_subdirectory(set)
 
 set(ALL_OBJECT_FILES

@@ -123,6 +123,12 @@ enum class PhysicalOperatorType : uint8_t {
 	// Secret
 	// -----------------------------
 	CREATE_SECRET,
+
+	// -----------------------------
+	// TDStore_ExtensionOperator
+	// -----------------------------
+	EXCHANGE_IN = 253,
+	EXCHANGE_OUT = 254,
 };
 
 string PhysicalOperatorToString(PhysicalOperatorType type);

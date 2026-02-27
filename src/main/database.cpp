@@ -2,6 +2,7 @@
 
 #include "duckdb/catalog/catalog.hpp"
 #include "duckdb/common/virtual_file_system.hpp"
+#include "duckdb/distribute/fragment_scheduler.hpp"
 #include "duckdb/execution/index/index_type_set.hpp"
 #include "duckdb/execution/operator/helper/physical_set.hpp"
 #include "duckdb/function/cast/cast_function_set.hpp"
@@ -79,6 +80,7 @@ DatabaseInstance::~DatabaseInstance() {
 	connection_manager.reset();
 	object_cache.reset();
 	scheduler.reset();
+	distribute_scheduler.reset();
 	db_manager.reset();
 
 	// stop the log manager, after this point Logger calls are unsafe.
@@ -301,6 +303,7 @@ void DatabaseInstance::Initialize(const char *database_path, DBConfig *user_conf
 	external_file_cache = make_uniq<ExternalFileCache>(*this, config.options.enable_external_file_cache);
 
 	scheduler = make_uniq<TaskScheduler>(*this);
+	distribute_scheduler = make_uniq<FragmentScheduler>(*this);
 	object_cache = make_uniq<ObjectCache>();
 	connection_manager = make_uniq<ConnectionManager>();
 
@@ -382,6 +385,10 @@ DatabaseManager &DatabaseManager::Get(ClientContext &db) {
 
 TaskScheduler &DatabaseInstance::GetScheduler() {
 	return *scheduler;
+}
+
+FragmentScheduler &DatabaseInstance::GetDistributeScheduler() {
+	return *distribute_scheduler;
 }
 
 ObjectCache &DatabaseInstance::GetObjectCache() {

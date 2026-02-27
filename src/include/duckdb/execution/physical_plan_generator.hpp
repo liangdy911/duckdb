@@ -142,6 +142,8 @@ protected:
 	PhysicalOperator &CreatePlan(LogicalMaterializedCTE &op);
 	PhysicalOperator &CreatePlan(LogicalCTERef &op);
 	PhysicalOperator &CreatePlan(LogicalPivot &op);
+	PhysicalOperator &CreatePlan(LogicalExchangeOut &op);
+	PhysicalOperator &CreatePlan(LogicalExchangeIn &op, ClientContext &context);
 
 	PhysicalOperator &PlanAsOfJoin(LogicalComparisonJoin &op);
 	PhysicalOperator &PlanComparisonJoin(LogicalComparisonJoin &op);
